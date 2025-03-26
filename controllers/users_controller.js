@@ -1,3 +1,4 @@
+const User = require("../models/user");
 module.exports.profile = function(req, res){
     
     return res.render('user_profile', {
@@ -30,10 +31,33 @@ module.exports.signIn = async function(req, res){
 
 // get the sign up data
 
+
+
 module.exports.create = async function (req, res) {
-    //todo
-    
-}
+    try {
+        // Check if passwords match
+        if (req.body.password !== req.body.confirm_password) {
+            return res.redirect('back');
+        }
+
+        // Check if user already exists
+        let user = await User.findOne({ email: req.body.email });
+
+        if (!user) {
+            // Create a new user
+            await User.create(req.body);
+            return res.redirect('/users/sign_in');
+        } else {
+            console.log('User already exists');
+            return res.redirect('back');
+        }
+
+    } catch (err) {
+        console.log('Error in user sign up:', err);
+        return res.redirect('back');
+    }
+};
+
 module.exports.createSession = async function (req, res) {
     //todo
     
